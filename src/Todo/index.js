@@ -2,13 +2,16 @@ import React, { PureComponent } from 'react';
 import Item from './Item';
 import './Todo.css';
 
+const STORAGE_ITEMS_KEY = "todoItems";
+
 class Todo extends PureComponent {
-  state = {id: 1, showCompleted: false, newItemName: '', items: {}};
+  localStorageItems = () => JSON.parse(window.localStorage.getItem(STORAGE_ITEMS_KEY) || "{}");
+  state = {id: 1, showCompleted: false, newItemName: '', items: this.localStorageItems()};
   toggleCompleted = (id) => {
     const { items } = this.state;
     const newItems = {...items}
     newItems[id].completed = !newItems[id].completed;
-    this.setState({ items: newItems });
+    this.setState({ items: newItems }, this.updateLocalStorage);
   }
   toggleShowCompleted = () => {
     const { showCompleted } = this.state;
@@ -18,7 +21,10 @@ class Todo extends PureComponent {
     const { id, items, newItemName } = this.state;
     const newItems = {...items};
     newItems[id] = {completed: false, id, name: newItemName};
-    this.setState({newItemName: '', items: newItems, id: id + 1 });
+    this.setState({newItemName: '', items: newItems, id: id + 1 }, this.updateLocalStorage);
+  }
+  updateLocalStorage = () => {
+    window.localStorage.setItem(STORAGE_ITEMS_KEY, JSON.stringify(this.state.items));
   }
   getVisibleItems = () => {
     const props = {
