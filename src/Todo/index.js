@@ -26,6 +26,11 @@ class Todo extends PureComponent {
   updateLocalStorage = () => {
     window.localStorage.setItem(STORAGE_ITEMS_KEY, JSON.stringify(this.state.items));
   }
+  removeItem = (id) => {
+    const newItems = {...this.state.items};
+    delete newItems[id];
+    this.setState({ items: newItems }, this.updateLocalStorage);
+  }
   getVisibleItems = () => {
     const props = {
       toggleCompleted: this.toggleCompleted,
@@ -34,7 +39,7 @@ class Todo extends PureComponent {
     const visibleItems = [];
     Object.keys(items).forEach(id => {
       if (!items[id].completed || showCompleted) {
-        const newProps = {...props, ...items[id], id, key: id};
+        const newProps = {...props, ...items[id], id, key: id, removeItem: this.removeItem};
         visibleItems.push(<Item {...newProps} />)
       }
     });
